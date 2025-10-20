@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battle System - Creature Editors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        h1,
+        h4 {
+            text-align: center;
+        }
+
+        h3 {
+            margin-bottom: 4px;
+        }
+
+        /* Moveset */
+
+        .moveset-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .moveset1,
+        .moveset2 {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 520px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            background-color: #f2f2f2;
+            border: 2px solid #818181;
+            border-radius: 10px;
+            padding: 3px;
+            width: 150px;
+        }
+
+        .option label {
+            display: block;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-bottom: 1px solid rgb(197, 193, 193);
+        }
+
+        .option input {
+            display: none;
+        }
+
+        .option input:checked+label {
+            background-color: #ffffff;
+            font-weight: bold;
+            
+        }
+
+        .info p,
+        .accuracy p {
+            margin: 10px;
+        }
+
+
+        /* Creature Card */
+
+        .editor-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .creature-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: auto;
+            max-width: 500px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .section label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
+
+        .section select,
+        .section input {
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            max-width: 70px;
+        }
+
+        .nature {
+            width: 174px;
+        }
+
+
+        .stat-table {
+            width: 90%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-table th,
+        .stat-table tr:nth-child(1) {
+            height: 35px;
+        }
+
+        .stat-table th,
+        .stat-table td {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            max-width: 60px;
+        }
+
+        .stat-table input {
+            box-sizing: border-box;
+            text-align: center;
+            max-width: 50px;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        .hp-bar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            background: #4caf50;
+            width: 100%;
+        }
+
+        .current-hp {
+            width: 40px;
+        }
+
+        .hp-percent {
+            width: 40px;
+        }
+
+        select,
+        input[type="number"] {
+            padding: 2px;
+            margin: 3px 0;
+            text-align: center;
+        }
+
+
+        .moves {
+            margin-top: 20px;
+        }
+
+        .move-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .move-row input,
+        .move-row select {
+            width: 100px;
+            margin-right: 5px;
+            padding: 4px;
+            box-sizing: border-box;
+        }
+
+        .move-row input[type="text"] {
+            width: 150px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="color: darkblue; font-size: 50px; margin-bottom: 18px;">
+        Damage Calculator
+    </h1>
+
+    <div class="moveset-container">
+        <div class="moveset1">
+            <div class="options">
+                <div class="option">
+                    <input type="radio" name="move" id="move1" checked>
+                    <label for="move1">Fire Blast</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="move" id="move2">
+                    <label for="move2">Giga Drain</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="move" id="move3">
+                    <label for="move3">Earth Power</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="move" id="move4">
+                    <label for="move4">Hydro Pump</label>
+                </div>
+            </div>
+            <div class="info">
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+            </div>
+            <div class="accuracy">
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+            </div>
+        </div>
+
+        <div class="moveset2">
+            <div class="options">
+                <div class="option">
+                    <input type="radio" name="move" id="move5" checked>
+                    <label for="move5">Fire Blast</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="move" id="move6">
+                    <label for="move6">Giga Drain</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="move" id="move7">
+                    <label for="move7">Earth Power</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="move" id="move8">
+                    <label for="move8">Hydro Pump</label>
+                </div>
+            </div>
+            <div class="info">
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+            </div>
+            <div class="accuracy">
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+                <p>10 - 20%</p>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+
+    <h4 style="font-size: 20px; margin-top: 14px">
+        0 SpA Creature 1 Blizzard vs. 248 HP / 0 SpD Creature 2: 127-150 (33.1 -
+        39.1%)
+    </h4>
+
+    <!-- Container -->
+    <div class="editor-container">
+        <!-- Creature 1 -->
+        <div class="creature-box" id="creature1">
+            <h2 id="creature1-name">Creature 1</h2>
+            <div class="section">
+                <label>Type:</label>
+                <select class="type-select-1"></select>
+                <select class="type-select-2"></select>
+                <br />
+
+                <label>Nature:</label>
+                <select class="nature">
+                    <option value="--">Hardy (Neutral)</option>
+                    <option value="2,1">Bold (+Def, -Atk)</option>
+                    <option value="3,1">Modest (+Sp.Atk, -Atk)</option>
+                    <option value="4,1">Calm (+Sp.Def, -Atk)</option>
+                    <option value="5,1">Timid (+Speed, -Atk)</option>
+                </select>
+                <br>
+
+                <label>Level:</label>
+                <input type="number" class="level" value="100" min="1" max="100" />
+                <br />
+            </div>
+
+            <table class="stat-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Base</th>
+                        <th>IV</th>
+                        <th>EV</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>HP</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                    </tr>
+                    <tr>
+                        <td>Attack</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Defense</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Sp. Atk</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Sp. Def</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Speed</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Res</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Luck</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ev-total">510</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="hp-bar-container">
+                <label>Current HP:</label>
+                <input type="number" class="current-hp" value="100" min="0"/>
+                / <span class="max-hp-display">--</span> &nbsp;&nbsp; 
+                (<input type="number" class="hp-percent" value="100" min="0" max="100" />%)
+                <div class="hp-bar">
+                    <div class="hp-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="moves">
+                <h3>Moves:</h3>
+            </div>
+
+        </div>
+
+        <!-- Creature 2 -->
+        <div class="creature-box" id="creature2">
+            <h2>Creature 2</h2>
+
+            <div class="section">
+                <label>Type:</label>
+                <select class="type-select-1"></select>
+                <select class="type-select-2"></select>
+                <br />
+                
+                <label>Nature:</label>
+                <select class="nature">
+                    <option value="--">Hardy (Neutral)</option>
+                    <option value="2,1">Bold (+Def, -Atk)</option>
+                    <option value="3,1">Modest (+Sp.Atk, -Atk)</option>
+                    <option value="4,1">Calm (+Sp.Def, -Atk)</option>
+                    <option value="5,1">Timid (+Speed, -Atk)</option>
+                </select>
+                <br>
+                <label>Level:</label>
+                <input type="number" class="level" value="100" min="1" max="100" />
+                <br>
+                
+            </div>
+
+            <table class="stat-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Base</th>
+                        <th>IV</th>
+                        <th>EV</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>HP</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                    </tr>
+                    <tr>
+                        <td>Attack</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Defense</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Sp. Atk</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Sp. Def</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Speed</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Res</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td>Luck</td>
+                        <td><input type="number" min="1"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><input type="number" min="0"/></td>
+                        <td><span>--</span></td>
+                        <td style="padding: 0;">
+                            <select class="boosted" style="width: 50px; border-radius: 10px;">
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="0" selected>--</option>
+                                <option value="-1">-1</option>
+                                <option value="-2">-2</option>
+                                <option value="-3">-3</option>
+                                <option value="-4">-4</option>
+                                <option value="-5">-5</option>
+                                <option value="-6">-6</option>
+                            </select>
+                        </td>
+                        <td class="boostedTotal" style="width: 50px; padding: none;"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="ev-total">510</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="hp-bar-container">
+                <label>Current HP:</label>
+                <input type="number" class="current-hp" value="100" min="0" />
+                / <span class="max-hp-display">--</span> &nbsp;&nbsp; 
+                (<input type="number" class="hp-percent" value="100" min="0" max="100" />%)
+                <div class="hp-bar">
+                    <div class="hp-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="moves">
+                <h3>Moves:</h3>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+
+        const types = [
+            "--", "Slime", "Flame", "Water", "Plant", "Electric", "Earth", "Ice", "Poison",
+            "Dark", "Psychic", "Gravity", "Alloy", "Time", "Luck", "Light", "Crystal",
+            "Spirit", "Mystic", "Storm", "Lunar", "Wind", "Decay"
+        ];
+
+        const categories = ["Physical", "Special", "Status"];
+
+        function calculateStats(boxId) {
+            const box = document.getElementById(boxId);
+            const level = parseInt(box.querySelector(".level").value) || 100;
+            const rows = box.querySelectorAll("tbody tr");
+
+            const natureSelect = box.querySelector(".nature");
+            const natureValue = natureSelect.value;
+
+            const natureMultiplier = 0.1;
+            const evNeeded = 4;
+
+            const modifiers = [1, 1, 1, 1, 1, 1, 1, 1];
+
+            let totalEV = 0;
+
+            if (natureValue !== "--") {
+                const [upIndex, downIndex] = natureValue.split(",").map(Number);
+                modifiers[upIndex] = 1 + natureMultiplier;
+                modifiers[downIndex] = 1 - natureMultiplier;
+            }
+
+            rows.forEach((row, index) => {
+                const inputs = row.querySelectorAll("input");
+                const output = row.querySelector("span");
+
+                let boostSelect = row.querySelector(".boosted");
+                let boosts = boostSelect ? parseInt(boostSelect.value) || 0 : 0;
+
+                // Set defaults: Base = 100, IV = 31, EV = 0, each step is 0.25x additive
+                const defaultBaseStat = 100
+                const defaultBaseIV = 31
+                const step = 0.25
+
+
+                const baseInput = inputs[0];
+                const ivInput = inputs[1];
+
+                if (baseInput && !baseInput.value) baseInput.value = defaultBaseStat;
+                if (!ivInput.value) ivInput.value = defaultBaseIV;
+
+                let base = parseInt(baseInput.value);
+                let iv = parseInt(ivInput.value);
+                let ev = parseInt(inputs[2].value) || 0;
+
+                totalEV += ev;
+
+                let total;
+                if (index === 0) {
+                    // Calculate HP
+                    total = Math.floor(((2 * base + iv + Math.floor(ev / evNeeded)) * level) / 100) + level + 10;
+                } else {
+                    // Calculate Other Stats
+                    total = Math.floor(((2 * base + iv + Math.floor(ev / evNeeded)) * level) / 100 + 5);
+                    total = Math.floor(total * modifiers[index]); // Nature Multiplier
+
+                    if (modifiers[index] === 1) {
+                        output.style.backgroundColor = "white";
+                    } 
+                    else if (modifiers[index] > 1) {
+                        output.style.backgroundColor = "#ffcccc";
+                    } 
+                    else if (modifiers[index] < 1) {
+                        output.style.backgroundColor = "#cce5ff";
+                    }   
+                }
+
+                // Update EV total cell
+                let evTotalCell = box.querySelector(".ev-total");
+                if (evTotalCell) {
+                    evTotalCell.textContent = totalEV;
+                }
+
+                let boostedTotalCell = row.querySelector(".boostedTotal");
+                if (boostedTotalCell && boostSelect) {
+                    if (total > 0 && (boosts != 0)) {
+                        boostedTotalCell.textContent = Math.floor(total * (1 + (boosts * step)))
+                    }
+                    else
+                    {
+                        boostedTotalCell.textContent = total
+                    }
+                }
+
+                output.textContent = total;
+                updateMovesetDisplay();
+            });
+
+            
+
+            updateHPBar(box);
+        }
+
+
+        function updateHPBar(box) {
+            const current = parseInt(box.querySelector(".current-hp").value) || 0;
+            const max = parseInt(box.querySelector("tbody tr:nth-child(1) span").textContent) || 1;
+
+            const percent = Math.min(100, Math.floor((current / max) * 100));
+            const fill = box.querySelector(".hp-bar-fill");
+            const percentText = box.querySelector(".hp-percent");
+            const maxDisplay = box.querySelector(".max-hp-display");
+
+            // Change HP bar color
+            fill.style.width = `${percent}%`;
+            fill.style.backgroundColor =
+                percent > 50 ? "#4caf50" : percent > 25 ? "#ffcc00" : "#f44336";
+            percentText.textContent = `${percent}%`;
+
+            // Update the displayed Max HP
+            maxDisplay.textContent = max;
+
+            // Prevent going over max hp
+            const currentInput = box.querySelector(".current-hp");
+            if (current > max) {
+                currentInput.value = max;
+            }
+        }
+
+        function syncHPInputs(box) {
+            const currentInput = box.querySelector(".current-hp");
+            const percentInput = box.querySelector(".hp-percent");
+
+            // On raw HP input change, update percent
+            currentInput.addEventListener("input", () => {
+                const maxHP = parseInt(box.querySelector("tbody tr:nth-child(1) span").textContent) || 1;
+                const current = parseInt(currentInput.value) || 0;
+                const percent = Math.round((current / maxHP) * 100);
+                percentInput.value = percent;
+                updateHPBar(box);
+            });
+
+            // On percent input change, update raw HP
+            percentInput.addEventListener("input", () => {
+                const maxHP = parseInt(box.querySelector("tbody tr:nth-child(1) span").textContent) || 1;
+                let percent = parseInt(percentInput.value) || 0;
+                percent = Math.min(100, Math.max(0, percent)); 
+                const newCurrent = Math.round((percent / 100) * maxHP);
+                currentInput.value = newCurrent;
+                updateHPBar(box);
+            });
+        }
+
+        function updateMovesetDisplay() {
+            ['creature1', 'creature2'].forEach((creatureId, i) => {
+                const creatureBox = document.getElementById(creatureId);
+                const moveRows = creatureBox.querySelectorAll(".move-row");
+                const movesetBox = document.querySelector(`.moveset${i + 1}`);
+                const options = movesetBox.querySelectorAll(".option label");
+                const info = movesetBox.querySelectorAll(".info p");
+                const accuracy = movesetBox.querySelectorAll(".accuracy p")
+
+                moveRows.forEach((row, index) => {
+                    const moveName = row.querySelector("input[type='text']").value || "Unknown";
+                    const movePower = parseInt(row.querySelector(".move-power").value) || 0;
+                    const moveAccuracy = parseInt(row.querySelector(".move-accuracy").value) || 0;
+                    const category = row.querySelector("select:nth-of-type(2)").value; 
+
+                    // Default to SpA vs SpDef
+                    let attackerStatIndex = 3; // Sp. Atk
+                    let defenderStatIndex = 4; // Sp. Def
+
+                    if (category === "Physical") {
+                        attackerStatIndex = 1; // Attack
+                        defenderStatIndex = 2; // Defense
+                    }
+
+
+                    // Damage calculation
+                    const attackerStat = parseInt(creatureBox.querySelectorAll("tbody tr")[attackerStatIndex].querySelector("span").textContent) || 1;
+                    const attackerLuck = parseInt(creatureBox.querySelectorAll("tbody tr")[7].querySelector("span").textContent) || 1;
+                    
+                    const defenderBox = document.getElementById(i === 0 ? "creature2" : "creature1");
+                    const defenderStat = parseInt(defenderBox.querySelectorAll("tbody tr")[defenderStatIndex].querySelector("span").textContent) || 1;
+                    const defenderHP = parseInt(defenderBox.querySelectorAll("tbody tr")[0].querySelector("span").textContent) || 1;
+                    const defenderLuck = parseInt(defenderBox.querySelectorAll("tbody tr")[7].querySelector("span").textContent) || 1;
+
+                    const damage = Math.floor((movePower * attackerStat) / defenderStat);
+                    const minPercent = Math.max(1, Math.floor((damage * 0.9 / defenderHP) * 100));
+                    const maxPercent = Math.max(minPercent, Math.floor((damage * 1.00 / defenderHP) * 100));
+                    
+                    // Luck Calculatrion
+                    const luckRatio = attackerLuck / Math.max(defenderLuck, 1); 
+                    const clampedRatio = Math.max(0.5, Math.min(2, luckRatio)); 
+                    const luckEffect = (Math.log2(clampedRatio) * 15);
+
+                    // Moveset display
+                    if (options[index]) {
+                        options[index].textContent = moveName;
+                    }
+                    if (info[index]) {
+                        info[index].textContent = `${minPercent}% - ${maxPercent}%`;
+                    }
+                    if (accuracy[index]) {
+                        accuracy[index].textContent = `acc: ${moveAccuracy}, luck: ${luckEffect > 0 ? '+' : ''}${luckEffect.toFixed(2)}%`;
+                    }
+                });
+            });
+        }
+
+
+
+
+
+        document.querySelectorAll(".creature-box").forEach((box) => {
+            box.addEventListener("input", () => calculateStats(box.id));
+            syncHPInputs(box)
+        });
+    </script>
+
+    <script>
+        function createSelect(options) {
+            const select = document.createElement("select");
+            options.forEach(option => {
+                const opt = document.createElement("option");
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+            return select;
+        }
+
+        function createMoveRow() {
+            const row = document.createElement("div");
+            row.classList.add("move-row");
+
+            const moveName = document.createElement("input");
+            moveName.type = "text";
+            moveName.style.width = "100px";
+            moveName.placeholder = "Move name";
+
+            const movePower = document.createElement("input");
+            movePower.type = "number";
+            movePower.min = 0;
+            movePower.placeholder = "Power";
+            movePower.classList.add("move-power");
+
+            const moveAccuracy = document.createElement("input");
+            moveAccuracy.type = "number";
+            moveAccuracy.min = 0;
+            moveAccuracy.style.maxWidth = "84px";
+            moveAccuracy.max = 100;
+            moveAccuracy.placeholder = "Accuracy";
+            moveAccuracy.classList.add("move-accuracy");
+
+            const typeSelect = createSelect(types);
+            const categorySelect = createSelect(categories);
+
+            row.appendChild(moveName);
+            row.appendChild(movePower);
+            row.appendChild(moveAccuracy);
+            row.appendChild(typeSelect);
+            row.appendChild(categorySelect);
+
+            return row;
+        }
+
+        function addMoveRowsToCreature(creatureId, count = 4) {
+            const creature = document.getElementById(creatureId);
+            const movesContainer = creature.querySelector(".moves");
+
+            for (let i = 0; i < count; i++) {
+                const row = createMoveRow();
+                movesContainer.appendChild(row);
+            }
+        }
+
+        function populateTypeSelects() {
+            const typeSelects = document.querySelectorAll(".type-select-1, .type-select-2");
+            typeSelects.forEach(select => {
+                types.forEach(type => {
+                    const option = document.createElement("option");
+                    option.value = type;
+                    option.textContent = type;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        // Wait for DOM to be ready before populating move rows
+        window.addEventListener("DOMContentLoaded", () => {
+            addMoveRowsToCreature("creature1");
+            addMoveRowsToCreature("creature2");
+            populateTypeSelects();
+
+            setTimeout(updateMovesetDisplay, 100);
+        });
+    </script>
+
+</body>
+
+</html>
