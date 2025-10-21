@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onBeforeUnmount } from 'vue'
+import { computed, ref, onBeforeUnmount, onMounted } from 'vue'
 
 const props = defineProps({
     creature: { type: Object, required: true },
@@ -9,6 +9,74 @@ const props = defineProps({
     onHpPercentInput: Function,
     onStatsChange: Function,
     panelWidth: { type: String, default: '620px' }
+})
+
+// Loadout dropdown state
+const STORAGE_KEY = 'genomix_loadouts_v1'
+const showDropdown = ref(false)
+const searchQuery = ref('')
+const savedLoadouts = ref([])
+const dropdownRef = ref(null)
+
+function loadSavedLoadouts() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    savedLoadouts.value = raw ? JSON.parse(raw) : []
+  } catch (e) {
+    savedLoadouts.value = []
+  }
+}
+
+const filteredLoadouts = computed(() => {
+  if (!searchQuery.value) return savedLoadouts.value
+  const q = searchQuery.value.toLowerCase()
+  return savedLoadouts.value.filter(l => 
+    (l.name || '').toLowerCase().includes(q) ||
+    (l.type1 || '').toLowerCase().includes(q) ||
+    (l.type2 || '').toLowerCase().includes(q)
+  )
+})
+
+function selectLoadout(loadout) {
+  if (!loadout) {
+    showDropdown.value = false
+    return
+  }
+  // Deep copy fields into current creature
+  props.creature.name = loadout.name || props.creature.name
+  props.creature.imageUrl = loadout.imageUrl || props.creature.imageUrl || ''
+  props.creature.level = loadout.level || props.creature.level
+  props.creature.nature = loadout.nature || props.creature.nature
+  props.creature.type1 = loadout.type1 || props.creature.type1
+  props.creature.type2 = loadout.type2 || props.creature.type2
+  props.creature.currentHp = loadout.currentHp || props.creature.currentHp
+  props.creature.hpPercent = loadout.hpPercent || props.creature.hpPercent
+  if (Array.isArray(loadout.stats)) {
+    props.creature.stats = loadout.stats.map(s => ({ ...s }))
+  }
+  if (Array.isArray(loadout.moves)) {
+    props.creature.moves = loadout.moves.map(m => ({ ...m }))
+  }
+  // Notify parent to recalculate
+  props.onStatsChange && props.onStatsChange(props.creature)
+  showDropdown.value = false
+  searchQuery.value = ''
+}
+
+function handleClickOutside(e) {
+  if (dropdownRef.value && !dropdownRef.value.contains(e.target)) {
+    showDropdown.value = false
+  }
+}
+
+onMounted(() => {
+  loadSavedLoadouts()
+  // Close dropdown when clicking outside
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 
 // Simple map for icons/colors for a few types. Falls back to a neutral style.
@@ -136,6 +204,7 @@ onBeforeUnmount(() => {
     if (_onPointerUp) window.removeEventListener('pointerup', _onPointerUp)
     if (typeof _statOnPointerMove !== 'undefined' && _statOnPointerMove) window.removeEventListener('pointermove', _statOnPointerMove)
     if (typeof _statOnPointerUp !== 'undefined' && _statOnPointerUp) window.removeEventListener('pointerup', _statOnPointerUp)
+    document.removeEventListener('click', handleClickOutside)
 })
 
 // Helpers for stat bar graph (used in the UI to the right of the image)
@@ -202,35 +271,72 @@ function startStatDrag(e, idx) {
 
 <template>
     <div class="card p-3 creature-box" :style="{ minWidth: props.panelWidth, maxWidth: props.panelWidth }">
-        <h2 class="mb-4">{{ props.creature.name }}</h2>
+        <!-- Creature name dropdown -->
+        <div ref="dropdownRef" class="creature-name-dropdown mb-4 position-relative">
+            <div class="dropdown-trigger d-flex align-items-center justify-content-between p-2 border rounded bg-light" 
+                 @click="showDropdown = !showDropdown" 
+                 style="cursor: pointer;">
+                <h2 class="mb-0">{{ props.creature.name }}</h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            
+            <div v-if="showDropdown" class="dropdown-menu-custom position-absolute w-100 mt-1 border rounded bg-white shadow">
+                <div class="p-2 border-bottom">
+                    <input v-model="searchQuery" 
+                           type="text" 
+                           class="form-control" 
+                           placeholder="Search loadouts..." 
+                           @click.stop
+                           autofocus />
+                </div>
+                <div class="dropdown-items-container">
+                    <div class="dropdown-item-custom p-2 border-bottom" 
+                         @click="selectLoadout(null)" 
+                         style="cursor: pointer;">
+                        <strong>Default (Keep Current)</strong>
+                    </div>
+                    <div v-for="loadout in filteredLoadouts" 
+                         :key="loadout.id" 
+                         class="dropdown-item-custom p-2 border-bottom" 
+                         @click="selectLoadout(loadout)" 
+                         style="cursor: pointer;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ loadout.name }}</strong>
+                                <div class="small text-muted">
+                                    Lv{{ loadout.level }} • {{ loadout.type1 }}{{ loadout.type2 && loadout.type2 !== '--' ? '/' + loadout.type2 : '' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="filteredLoadouts.length === 0 && searchQuery" class="p-3 text-center text-muted">
+                        No loadouts found
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Image + stat bars (image left, bars right) -->
-        <div class="row mb-3 align-items-stretch">
-            <!-- Image column (50%) -->
-            
-                <div class="col-12 col-md-6 d-flex justify-content-center"
-                     style="
-                        max-width: 300px;     /* prevent horizontal expansion */
-                        max-height: 260px;    /* prevent vertical expansion */
-                        width: 100%;          /* allow scaling on smaller screens */
-                        height: 100%;         /* fill available height but stay capped */
-                        overflow: hidden;     /* clip overflowing content */
-                    ">
-                    <img src="https://placehold.co/200x400.png" alt="creature" class="rounded w-100"
-                        style="object-fit: cover; height: 100%;" />
+        <div class="row mb-3 align-items-stretch g-2">
+            <!-- Image column -->
+            <div class="col-12 col-md-5 col-lg-4">
+                <div class="creature-image-wrapper">
+                    <img :src="props.creature.imageUrl || 'https://placehold.co/200x200.png'" 
+                         alt="creature" 
+                         class="creature-image rounded" />
                 </div>
+            </div>
 
-
-            
-
-            <!-- Stat bars column (50%) -->
-            <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
-                <div class="stat-bars flex-fill">
+            <!-- Stat bars column -->
+            <div class="col-12 col-md-7 col-lg-8">
+                <div class="stat-bars-wrapper">
                     <!-- Bar graph title -->
-                    <h6 class="text-center mb-3 fw-bold" style="font-size:1.2rem;">Base Stats</h6>
+                    <h6 class="text-center mb-2 fw-bold stat-bars-title">Base Stats</h6>
                     <div v-for="(name, idx) in statNames" :key="name"
-                        class="stat-bar-row d-flex align-items-center mb-2">
-                        <div class="stat-bar-label me-1" style="width:55px; font-size:0.78rem">
+                        class="stat-bar-row d-flex align-items-center mb-1">
+                        <div class="stat-bar-label me-1">
                             {{ name }}
                         </div>
                         <div class="stat-bar-track flex-grow-1" role="img"
@@ -241,7 +347,7 @@ function startStatDrag(e, idx) {
                                 backgroundColor: getBarColor(props.creature.stats[idx] && props.creature.stats[idx].base)
                             }"></div>
                         </div>
-                        <div class="stat-bar-value ms-1" style="width:30px; text-align:right; font-size:0.78rem">
+                        <div class="stat-bar-value ms-1">
                             {{ props.creature.stats[idx] && props.creature.stats[idx].base || 0 }}
                         </div>
                     </div>
@@ -479,8 +585,7 @@ function startStatDrag(e, idx) {
 
 .stat-bar-track {
     background: #f1f3f5;
-    height: 12px;
-    /* smaller track */
+    height: 10px;
     border-radius: 6px;
     overflow: hidden;
     cursor: ew-resize;
@@ -494,10 +599,89 @@ function startStatDrag(e, idx) {
 
 .stat-bar-label {
     color: #333;
+    width: 55px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 .stat-bar-value {
     color: #222;
+    width: 32px;
+    text-align: right;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.stat-bars-title {
+    font-size: 1rem;
+}
+
+.stat-bars-wrapper {
+    padding: 0.5rem;
+}
+
+/* Creature image styling */
+.creature-image-wrapper {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    background: white;
+}
+
+.creature-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .creature-image-wrapper {
+        max-width: 200px;
+        margin: 0 auto;
+    }
+    
+    .stat-bar-label {
+        width: 45px;
+        font-size: 0.7rem;
+    }
+    
+    .stat-bar-value {
+        width: 28px;
+        font-size: 0.7rem;
+    }
+    
+    .stat-bars-title {
+        font-size: 0.9rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .stat-bar-label {
+        width: 50px;
+    }
+}
+
+/* When panelWidth is 100%, make it extra responsive */
+.creature-box[style*="100%"] .creature-image-wrapper {
+    max-width: 180px;
+}
+
+.creature-box[style*="100%"] .stat-bar-label {
+    width: 50px;
+    font-size: 0.72rem;
+}
+
+.creature-box[style*="100%"] .stat-bar-value {
+    width: 30px;
+    font-size: 0.72rem;
+}
+
+.creature-box[style*="100%"] .stat-bars-title {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem !important;
 }
 
 .hp-bar {
@@ -507,5 +691,50 @@ function startStatDrag(e, idx) {
 
 .hp-bar .hp-bar-fill {
     height: 100% !important;
+}
+
+/* Dropdown styles */
+.dropdown-trigger:hover {
+    background-color: #e9ecef !important;
+}
+
+.dropdown-menu-custom {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-items-container {
+    overflow-y: auto;
+    max-height: 400px;
+    flex: 1;
+}
+
+.dropdown-items-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dropdown-items-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.dropdown-items-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.dropdown-items-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.dropdown-item-custom:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-item-custom:active {
+    background-color: #e9ecef;
 }
 </style>

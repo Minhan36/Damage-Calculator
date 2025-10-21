@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, onMounted, watch } from 'vue'
+import { reactive, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import CreatureCard from '../components/CreatureCard.vue'
 import Moveset from '../components/Moveset.vue'
 import DamagePreview from '../components/DamagePreview.vue'
@@ -39,6 +39,7 @@ const creatures = reactive([
   {
     id: 'creature1',
     name: 'Creature 1',
+    imageUrl: '',
     level: 100,
     nature: '--',
     type1: 'Flame',
@@ -60,6 +61,7 @@ const creatures = reactive([
   {
     id: 'creature2',
     name: 'Creature 2',
+    imageUrl: '',
     level: 100,
     nature: '--',
     type1: 'Water',
@@ -246,6 +248,42 @@ watch(creatures, () => calculateAll(), { deep: true })
 onMounted(() => {
   // initialize totals
   calculateAll()
+  // listen for loadouts applied from the loadouts page
+  const handler = (ev) => {
+    try {
+      const payload = ev.detail
+      if (!payload) return
+      // copy fields into creatures[0]
+      const target = creatures[0]
+      // keep id and default any missing fields
+      target.name = payload.name || target.name
+      target.level = payload.level || target.level
+      target.nature = payload.nature || target.nature
+      target.type1 = payload.type1 || target.type1
+      target.type2 = payload.type2 || target.type2
+      target.currentHp = payload.currentHp || target.currentHp
+      target.hpPercent = payload.hpPercent || target.hpPercent
+      target.imageUrl = payload.imageUrl || target.imageUrl || ''
+      // stats and moves: deep copy where present
+      if (Array.isArray(payload.stats)) {
+        target.stats = payload.stats.map(s => ({ ...s }))
+      }
+      if (Array.isArray(payload.moves)) {
+        target.moves = payload.moves.map(m => ({ ...m }))
+      }
+      // recalc after applying
+      calculateAll()
+    } catch (e) { console.error('applyLoadout handler error', e) }
+  }
+  window.addEventListener('genomix:applyLoadout', handler)
+  // remove listener on unmount
+  // store handler on component root so we can remove later
+  window.__genomixHandler = handler
+})
+
+onBeforeUnmount(() => {
+  const h = window.__genomixHandler
+  if (h) window.removeEventListener('genomix:applyLoadout', h)
 })
 </script>
 
