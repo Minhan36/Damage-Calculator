@@ -1,8 +1,8 @@
 <script setup>
 import { reactive, ref, onMounted, watch } from 'vue'
-import CreatureCard from './CreatureCard.vue'
-import Moveset from './Moveset.vue'
-import DamagePreview from './DamagePreview.vue'
+import CreatureCard from '../components/CreatureCard.vue'
+import Moveset from '../components/Moveset.vue'
+import DamagePreview from '../components/DamagePreview.vue'
 
 const props = defineProps({ msg: { type: String, default: 'Damage Calculator' } })
 

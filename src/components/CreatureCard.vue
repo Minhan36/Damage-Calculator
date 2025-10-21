@@ -202,28 +202,54 @@ function startStatDrag(e, idx) {
 
 <template>
     <div class="card p-3 creature-box" :style="{ minWidth: props.panelWidth, maxWidth: props.panelWidth }">
-        <h2>{{ props.creature.name }}</h2>
+        <h2 class="mb-4">{{ props.creature.name }}</h2>
 
         <!-- Image + stat bars (image left, bars right) -->
-        <div class="mb-3">
-            <div class="d-flex gap-3 align-items-start">
-                <div style="width:165px;flex:0 0 250x;">
-                    <img src="https://placehold.co/200x200.png" alt="creature" class="rounded img-fluid"
-                        style="object-fit:cover; width:100%; height:auto;" />
+        <div class="row mb-3 align-items-stretch">
+            <!-- Image column (50%) -->
+            
+                <div class="col-12 col-md-6 d-flex justify-content-center"
+                     style="
+                        max-width: 300px;     /* prevent horizontal expansion */
+                        max-height: 260px;    /* prevent vertical expansion */
+                        width: 100%;          /* allow scaling on smaller screens */
+                        height: 100%;         /* fill available height but stay capped */
+                        overflow: hidden;     /* clip overflowing content */
+                    ">
+                    <img src="https://placehold.co/200x400.png" alt="creature" class="rounded w-100"
+                        style="object-fit: cover; height: 100%;" />
                 </div>
+
+
+            
+
+            <!-- Stat bars column (50%) -->
+            <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
                 <div class="stat-bars flex-fill">
-                    <!-- Render a row for each stat; top row is HP -->
-                    <div v-for="(name, idx) in statNames" :key="name" class="stat-bar-row d-flex align-items-center mb-2">
-                        <div class="stat-bar-label me-1" style="width:75px; font-size:0.85rem">{{ name }}</div>
-                        <div class="stat-bar-track flex-grow-1" role="img" :aria-label="name + ' value ' + (props.creature.stats[idx] && props.creature.stats[idx].base || 0)"
-                            @pointerdown="startStatDrag($event, idx)">
-                            <div class="stat-bar-fill" :style="{ width: barWidthPercent(props.creature.stats[idx] && props.creature.stats[idx].base), backgroundColor: getBarColor(props.creature.stats[idx] && props.creature.stats[idx].base) }"></div>
+                    <!-- Bar graph title -->
+                    <h6 class="text-center mb-3 fw-bold" style="font-size:1.2rem;">Base Stats</h6>
+                    <div v-for="(name, idx) in statNames" :key="name"
+                        class="stat-bar-row d-flex align-items-center mb-2">
+                        <div class="stat-bar-label me-1" style="width:55px; font-size:0.78rem">
+                            {{ name }}
                         </div>
-                        <div class="stat-bar-value ms-1" style="width:25px; text-align:right; font-size:0.85rem">{{ props.creature.stats[idx] && props.creature.stats[idx].base || 0 }}</div>
+                        <div class="stat-bar-track flex-grow-1" role="img"
+                            :aria-label="name + ' value ' + (props.creature.stats[idx] && props.creature.stats[idx].base || 0)"
+                            @pointerdown="startStatDrag($event, idx)">
+                            <div class="stat-bar-fill" :style="{
+                                width: barWidthPercent(props.creature.stats[idx] && props.creature.stats[idx].base),
+                                backgroundColor: getBarColor(props.creature.stats[idx] && props.creature.stats[idx].base)
+                            }"></div>
+                        </div>
+                        <div class="stat-bar-value ms-1" style="width:30px; text-align:right; font-size:0.78rem">
+                            {{ props.creature.stats[idx] && props.creature.stats[idx].base || 0 }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
 
         <div class="mb-2">
             <div class="row g-2 align-items-center">
@@ -300,7 +326,7 @@ function startStatDrag(e, idx) {
                             <span v-if="natureIndices.up === ri" class="nature-symbol up">▲</span>
                             <span v-else-if="natureIndices.down === ri" class="nature-symbol down">▼</span>
                             <span>{{ ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed', 'Res', 'Luck'][ri]
-                            }}</span>
+                                }}</span>
                         </div>
                     </td>
                     <td><input type="number" v-model.number="row.base" min="0" class="form-control" /></td>
@@ -323,7 +349,7 @@ function startStatDrag(e, idx) {
                                     0,
                                     -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16
                                 ]" :value="v" :key="v">{{ v > 0 ? '+' + v : v
-                                    }}</option>
+                                }}</option>
                             </select>
                         </div>
                         <div v-else class="text-muted">&mdash;</div>
@@ -446,25 +472,40 @@ function startStatDrag(e, idx) {
 
 .stat-bars .stat-bar-row {
     align-items: center;
-    margin-bottom: 6px; /* reduce vertical spacing */
-    padding: 2px 0;
+    margin-bottom: 4px;
+    /* reduced vertical spacing */
+    padding: 1px 0;
 }
+
 .stat-bar-track {
     background: #f1f3f5;
-    height: 10px;
+    height: 12px;
+    /* smaller track */
     border-radius: 6px;
     overflow: hidden;
     cursor: ew-resize;
 }
+
 .stat-bar-fill {
     height: 100%;
-    transition: width 220ms ease, background-color 120ms linear;
+    transition: width 160ms ease, background-color 100ms linear;
     border-radius: 6px;
 }
+
 .stat-bar-label {
     color: #333;
 }
+
 .stat-bar-value {
     color: #222;
+}
+
+.hp-bar {
+    height: 10px !important;
+    /* slightly smaller than before */
+}
+
+.hp-bar .hp-bar-fill {
+    height: 100% !important;
 }
 </style>

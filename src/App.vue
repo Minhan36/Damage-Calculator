@@ -1,12 +1,13 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import DmgCalculator from './views/DmgCalculator.vue'
 </script>
 
 <template>
   <div>
+    <DmgCalculator />
   </div>
-  <HelloWorld />
 </template>
+
 
 <style scoped>
 .logo {
